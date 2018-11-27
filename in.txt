@@ -1,15 +1,16 @@
-Schemes: 
-	ab(A,B)
+Schemes:
+    snap(s,n,a,p)
+    NameHasID(n,s)
+
 Facts:
-	ab('joe','bob').
-	ab('jim','bob').
-	ab('joe','jim').
-	ab('bob','bob').
+    snap('12345','Snoopy','12 Apple','555-1234').
+    snap('67890','Van Pelt','34 Pear','555-5678').
+
 Rules:
+    NameHasID(N,S):-snap(S,N,A,P).
 
 Queries:
-	ab('joe','jim')?
-	ab( who, 'bob')?
-	ab('joe', anyone)?
-	ab(X,X)?
-	ab(X,Y)?
+    snap('67890','Van Pelt','34 Pear','555-5678')?
+    snap(S,N,A,P)?
+    NameHasID('Snoopy',Id)?
+    NameHasID(Name,'67890')?

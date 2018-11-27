@@ -1,11 +1,14 @@
 #pragma once 
 
+#include <utility>
+
 #include "token.h"
 #include "datalogProgram.h"
 #include "predicate.h"
 #include "parameter.h"
 #include "relationalDatabase.h"
 #include "relation.h"
+#include "rule.h"
 
 #include "namespaces.h"
 
@@ -21,5 +24,10 @@ class Interpreter{
     
     void addSchemes();
     void addFacts();
+    
+    // new functions
+    void runRules();
+    bool runRule(shared_ptr<Rule>);
+    std::pair<unsigned int, shared_ptr<Relation>> runQuery(shared_ptr<Relation>, shared_ptr<Predicate>);
   
 };

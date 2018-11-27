@@ -35,3 +35,21 @@ string Relation::toString() {
   
   return output;
 }
+
+string Relation::debugToString() {
+	string output = "";
+	for (unsigned int i = 0; i < schemeParameters.size(); i++) {
+		output += schemeParameters[i] + " ";
+	}
+	output += "\n";
+
+	for (set<vector<string>>::iterator i = this->rows.begin(); i != this->rows.end(); i++) {
+		vector<string> row = *i;
+		for (unsigned int j = 0; j < row.size(); j++) {
+			output += row[j] + ", ";
+		}
+		output += "\n";
+	}
+
+	return output;
+}

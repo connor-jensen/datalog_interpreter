@@ -5,6 +5,7 @@
 #include <vector>
 #include <sstream>
 #include <set>
+#include <algorithm>
 
 using std::vector;
 using std::ifstream;
@@ -17,5 +18,6 @@ using std::make_shared;
 using std::shared_ptr;
 using std::set;
 using std::pair;
+
 
 //using namespace std;

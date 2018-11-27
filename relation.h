@@ -8,6 +8,7 @@ class Relation {
     Relation(string, vector<string>);
     void addRow(vector<string>);
     string toString();
+    string debugToString();
     string name;
     vector<string> schemeParameters;
     set<vector<string>> rows;

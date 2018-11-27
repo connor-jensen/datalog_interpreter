@@ -78,16 +78,13 @@ int main(int argc, char* argv[])
     Scanner scanner(argv[1]);
     std::vector<shared_ptr<Token>> tokens = scanner.lexicalAnalyzer();
     
-    // Parser parser = Parser(tokens);
-    // shared_ptr<DatalogProgram> program = parser.datalogParsing();
+    Parser parser = Parser(tokens);
+    shared_ptr<DatalogProgram> program = parser.datalogParsing();
     
-    // Interpreter interpreter = Interpreter(program);
-    // interpreter.createDatabase();
+    Interpreter interpreter = Interpreter(program);
+    interpreter.createDatabase();
     
-    // std::cout << interpreter.runQueries();
-    for (auto token : tokens) {
-        std::cout << token->toString() << std::endl;
-    }
+    std::cout << interpreter.runQueries();
     
     return 0;
 }
