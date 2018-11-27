@@ -1,0 +1,10 @@
+Schemes:
+  Schedule(D,C)
+Facts:
+  Schedule('M','236').
+  Schedule('M','113').
+  Schedule('T','113l').
+Rules:
+
+Queries:
+  Schedule(X, '113')?
