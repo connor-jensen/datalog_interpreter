@@ -14,7 +14,6 @@ class RelationalDatabase{
     shared_ptr<Relation> getRelation(string);
     shared_ptr<Relation> relationUnion(shared_ptr<Relation>, shared_ptr<Relation>);
 	  shared_ptr<Relation> join(shared_ptr<Relation>, shared_ptr<Relation>);
-	
     
     void addRelation(string, shared_ptr<Relation>);
  

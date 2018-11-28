@@ -56,15 +56,14 @@ string Interpreter::runQueries() {
   vector<shared_ptr<Predicate>> queries = program->queries;
   
   for (auto query : queries) {
-    string relation_name = query->id->getContent();
-    vector<shared_ptr<Parameter>> parameter_list = query->parameterList;
-    
-    shared_ptr<Relation> relation = this->database->getRelation(relation_name);
+    string relationName = query->id->getContent();
+
+    shared_ptr<Relation> relation = this->database->getRelation(relationName);
     if (relation == nullptr) continue;
 
     std::pair<unsigned int, shared_ptr<Relation>> queryResult = this->runQuery(relation, query);
-    unsigned int selectSize = queryResult.first;
-    shared_ptr<Relation> result = queryResult.second;
+    unsigned int selectSize = std::get<0>(queryResult);
+    shared_ptr<Relation> result = std::get<1>(queryResult);
     
     output += query->toString() + "?";
     if (selectSize == 0) {
@@ -121,9 +120,9 @@ string Interpreter::runQueries() {
     // }
   }
   // if newline at end is a problem:
-  // if (!output.empty()) {
-  //   output.pop_back();
-  // }
+  if (!output.empty()) {
+    output.pop_back();
+  }
   
   return output;
 }
@@ -132,15 +131,20 @@ void Interpreter::runRules() {
   std::vector<shared_ptr<Rule>> rules = this->program->rules;
 
   int passes = 0;
-  bool change = false;
-  while(!change) {
+  bool change;
+  // while there is change, keep going
+   do {
+    change = false;
     for (auto r : rules) {
+      // change = false;
       if (runRule(r)) {
         change = true;
       }
-      passes++;
     }
-  }
+    passes++;
+  } while(change);
+
+  std::cout << "Schemes populated after " << passes << " passes through the Rules." << std::endl;
 }
 
 bool Interpreter::runRule(shared_ptr<Rule> r) {
@@ -159,10 +163,10 @@ bool Interpreter::runRule(shared_ptr<Rule> r) {
     std::pair<unsigned int, shared_ptr<Relation>> queryResult = this->runQuery(operand, p);
 
     if (joinResult == nullptr){
-      joinResult = queryResult.second;
+      joinResult = std::get<1>(queryResult);
     }
     else {
-      joinResult = database->join(joinResult, queryResult.second);
+      joinResult = database->join(joinResult, std::get<1>(queryResult));
 
     }
   }
@@ -190,37 +194,45 @@ bool Interpreter::runRule(shared_ptr<Rule> r) {
   shared_ptr<Relation> renameResult = database->rename(projectResult, originalRelation->schemeParameters);
 
   unsigned int sizeBefore = 0;
-  if (originalRelation == nullptr){
+  
+  if (originalRelation != nullptr){
     sizeBefore = originalRelation->rows.size();
   }
 
   shared_ptr<Relation>unionResult = database->relationUnion(originalRelation, renameResult);
   database->addRelation(relationName, unionResult);
 
-  return(unionResult->rows.size() != sizeBefore);
+  bool changed = (unionResult->rows.size() != sizeBefore);
+  return changed;
 
 
 
 }
 
 std::pair<unsigned int, shared_ptr<Relation>> Interpreter::runQuery(shared_ptr<Relation> r, shared_ptr<Predicate> p) {
+  bool testError = false;
   std::vector<shared_ptr<Parameter>> parameterList = p->parameterList;
   std::vector<std::string> values;
 
-  std::string s = "";
   for (auto param : parameterList) {
     values.push_back(param->value->getContent());
   }
 
   shared_ptr<Relation> selectResult = this->database->select(r, values);
+  if (selectResult->schemeParameters.size() == 0) {
+    testError = true;
+  }
   
   std::vector<std::string> newScheme;
-  for (int i = 0; i < parameterList.size(); i++) {
+  for (unsigned int i = 0; i < parameterList.size(); i++) {
     if (parameterList[i]->type == ID) {
       newScheme.push_back(r->schemeParameters[i]);
     }
   }
-  shared_ptr<Relation> projectResult = this->database->project(r, newScheme);
+  shared_ptr<Relation> projectResult = this->database->project(selectResult, newScheme);
+  if (projectResult->schemeParameters.size() == 0) {
+    testError = true;
+  }
 
   std::vector<std::string> scheme;
   for (auto param : parameterList) {
@@ -228,7 +240,10 @@ std::pair<unsigned int, shared_ptr<Relation>> Interpreter::runQuery(shared_ptr<R
       scheme.push_back(param->value->getContent());
     }
   }
-  shared_ptr<Relation> renameResult = this->database->rename(r, scheme);
+  shared_ptr<Relation> renameResult = this->database->rename(projectResult, scheme);
+  if (renameResult->schemeParameters.size() == 0) {
+    testError = true;
+  }
 
   return std::pair<unsigned int, shared_ptr<Relation>> (selectResult->rows.size(), renameResult);
 }
