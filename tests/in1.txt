@@ -1,10 +1,12 @@
 Schemes:
-  Schedule(D,C)
+  a(w, x)
+  b(x, y)
 Facts:
-  Schedule('M','236').
-  Schedule('M','113').
-  Schedule('T','113l').
+  a('1','2').
+  a('1','3').
+  b('2','4').
+  b('2','5').
 Rules:
-
+  a(F,G):-b(G,H).
 Queries:
-  Schedule('M', C)?
+  a('1', H)?
