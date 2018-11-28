@@ -1,10 +1,16 @@
 Schemes:
-  Schedule(D,C)
+   y(l,p)
+   q(m,n)
+   x(o,q)
+
 Facts:
-  Schedule('M','236').
-  Schedule('M','113').
-  Schedule('T','113l').
+   y('7','2').
+   x('7','5').
+   q('4','2').
+   q('4','4').
+
 Rules:
+   y(C,D):-q(C,C),x(X,D).
 
 Queries:
-  Schedule(C, C)?
+   y('4',B)?
